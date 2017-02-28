@@ -1,0 +1,43 @@
+function [ L,R,E ] = ORPCA_new( Z, k, lambda,beta )
+% min 0.5*|| Z - LR^T ||F + 0.5*lambda||L||F+ 0.5*lambda||R||F 
+%     + beta*||E||_1
+%% Initializing:
+[m,n] = size(Z);
+L = randn(m,k);
+R = randn(n,k);
+E = zeros(m,n);
+S = Z - L*R' -E;
+maxiter = 8;
+inneriter = 3;
+iter = 1;
+converged = true;
+stopnorm = 0.5* norm(S,'fro')^2 + 0.5*lambda*norm(L,'fro')^2+ 0.5*lambda*norm(R,'fro')^2...
++ beta*sum(sum(abs(E)));
+%%
+       while converged
+         for i = 1: k
+           S = S + L(:,i)*R(:,i)';
+           for inner = 1:inneriter
+               L(:,i) =S*R(:,i)./ (lambda+ norm(R(:,i))^2);
+               R(:,i) =S'*L(:,i)./ (lambda+ norm(L(:,i))^2);
+           end
+           S = S - L(:,i)*R(:,i)';
+         end
+         E = max(Z-S-beta,0);
+         iter = iter+1;
+         tempstop = stopterm;
+         stopterm = 0.5* norm(S,'fro')^2 + 0.5*lambda*norm(L,'fro')^2+ 0.5*lambda*norm(R,'fro')^2...
+         +beta*sum(sum(abs(E)));
+     if iter==1
+         Decrease = tempstop - stopterm;
+     end
+     if iter == maxiter||tempstop-stopterm >0 && tempstop- nowobj < epsilon*Decrease 
+         converged = false;
+     end
+       end
+
+ 
+
+
+end
+
