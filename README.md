@@ -1,6 +1,5 @@
 # subspace-clustering in the '/gitlocal' folder
-mainly aimed at scalable subspace clustering
-
+mainly aimed at scalable subspace clustering and our proposed method---'NLRR++' has been submitted to KDD2017
 1.Subspace clustering methods are organized in folders '~/ORPCA, ~/OLRSC, ~/LRR, ~/SSC, ~/NLRRSS'
 
 2.NLRR ('NLRR.m', 'NLRRE.m') and NLRR++ ('NLRRplus.m', 'NLRRplusE.m') functions are displayed in the folder'~/NLRRSS' ;
