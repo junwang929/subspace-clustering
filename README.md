@@ -1,16 +1,18 @@
 # subspace-clustering in the '/gitlocal' folder
-mainly aimed at scalable subspace clustering and our proposed method---'NLRR++' has been submitted to KDD2017
-1.Subspace clustering methods are organized in folders '~/ORPCA, ~/OLRSC, ~/LRR, ~/SSC, ~/NLRRSS'
 
-2.NLRR ('NLRR.m', 'NLRRE.m') and NLRR++ ('NLRRplus.m', 'NLRRplusE.m') functions are displayed in the folder'~/NLRRSS' ;
+Experimental code for comparing our new algorithm for subspace clustering---'NLRR++' with other existing methods. 
 
-3.all executable files are named as 'test**.m' which can be executed directly;
+1. Subspace clustering methods are organized in folders '~/ORPCA, ~/OLRSC, ~/LRR, ~/SSC, ~/NLRRSS'
 
-4.datasets: 'Imagenet'(features trained by CNN), 'MNIST', 'SVHN', 'USPS', 'Protein';
+2. NLRR ('NLRR.m', 'NLRRE.m') and NLRR++ ('NLRRplus.m', 'NLRRplusE.m') functions are displayed in the folder'~/NLRRSS'. 
 
-5.clustering baseline and evaluation metric function are in the '~/clusterings' folder;
+3. Code for running experiments are named as 'test**.m' which can be executed directly. 
 
-6.Compared with methods:
+4. Datasets: 'Imagenet'(features trained by CNN), 'MNIST', 'SVHN', 'USPS', 'Protein'. 
+
+5. Clustering baseline and evaluation metric function are in the '~/clusterings' folder. 
+
+6. Competing methods:
 
 (1) NLRR:Jie Shen and Ping Li. 2016. Learning structured low-rank representation via matrix factorization. In Proceedings of the 19th International Conference on Articial Intelligence and Statistics (ICAIS). 500–509
 
