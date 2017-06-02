@@ -9,10 +9,11 @@ function [U,V,obj,Time] = NLRR( Z,A,U,V,beta,k,epsilon)
  D = A*U;
  W = zeros(m,k);
  mu = 1e-4;
- maxiter = 10;
+ maxiter = 15;
  obj = [];
  Time = [];
  Time = [Time 0];
+ sumTime = 0;
 %---------------Updating----------------
  
  R = Z - A*U*V';
@@ -23,25 +24,29 @@ function [U,V,obj,Time] = NLRR( Z,A,U,V,beta,k,epsilon)
  tic;
  totaltime = 0;
  converged = true;
+ T_sec = 0;
 while converged
-
+  tic;
  timebegin = cputime;
   U = inv(mu* A'*A + eye(n))* A'*(W + mu*D);
   V = Z'*D*inv(D'*D+ eye(k)/beta); 
   D = (mu*A*U + beta*Z*V -W)* inv(beta*V'*V + mu* eye(k));
   leq1 = D - A*U;
+  T_sec = toc;
+  sumTime = sumTime + T_sec;
+  Time = [Time sumTime];
   W = W + mu*leq1;
   mu = 1.1* mu;
   tempobj = nowobj;
   nowobj = 0.5*norm(Z-A*U*V', 'fro')^2+0.5*beta*norm(U,'fro')^2+0.5*beta*norm(V, 'fro')^2;
   obj = [obj nowobj];
   totaltime = totaltime + (cputime - timebegin);
-  fprintf('Iter %g Obj %g Time %g\n', iter, nowobj, totaltime);
+  fprintf('Iter %g Obj %g Diff %g Time %g \n', iter, nowobj,tempobj - nowobj, totaltime);
   if iter==1 
     Decrease = tempobj - nowobj;
   end
    
-  if tempobj - nowobj >0 && tempobj - nowobj < epsilon*Decrease || iter == maxiter
+  if iter == maxiter|| tempobj - nowobj >0 && tempobj - nowobj < epsilon*Decrease 
     converged = false;
   end
    iter = iter +1;

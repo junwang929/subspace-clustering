@@ -1,8 +1,9 @@
-clear all;
+function [ output_args ] = test_SVHN( root_dir,carryon)
+
 load 'SVHN.mat';
 warning('off');
 addpath('clusterings/');
-maxNumCompThreads(1);
+% maxNumCompThreads(1);
 data = data'./255;
 [label,indlabel] = sort(label,'ascend');
 data = data(:,indlabel);
@@ -15,26 +16,55 @@ nk = calnumber(label);
 rank = nk*70
 
  %% Initiliazing:
-  [U,S,V] = svds( data'*data,rank);
-  U = 0.9*U*sqrt(S) ;
-  V = 0.9*V*sqrt(S) ;
-%  U = 0.00001*rand(size(data,2),rank);
-%  V = 0.01*rand(size(data,2),rank); 
+%   [U,S,V] = svds( data'*data,rank);
+%   U = 0.9*U*sqrt(S) ;
+%   V = 0.9*V*sqrt(S) ;
+ U = 0.00001*rand(size(data,2),rank);
+ V = 0.01*rand(size(data,2),rank); 
  initialvalue.U = U;
  initialvalue.V = V;
  parameter.rank = rank;
  parameter.epsilon = 0.005;
- parameter.inner = 4;
+ parameter.inner = 3;
  fprintf('SVHN with size %g, rank %g\n', 9001,rank);
+
+ if ~exist(root_dir, 'dir')
+    mkdir(root_dir)
+ end
+ if nargin <2
+     carryon = 1;
+ end
  %% NLRR++
- [fvalue_N1,ACCN1,SN1,cTN1] = wholeline( data,label,'NLRR++',initialvalue,parameter);
+ [results_nlrrp] = wholeline( data,label,'NLRR++',initialvalue,parameter);
+ data_file = [root_dir 'nlrrp.mat'];
+ save(data_file, 'results_nlrrp');
+ fprintf('save to %s\n', data_file);
  %% NLRR
- [fvalue_N2,ACCN2,SN2,cTN2] = wholeline( data,label,'NLRR',initialvalue,parameter);
+ [results_nlrr] = wholeline( data,label,'NLRR',initialvalue,parameter);
+ data_file = [root_dir 'nlrr.mat'];
+ save(data_file, 'results_nlrr');
+ fprintf('save to %s\n', data_file);
+ if carryon ==1
  %% OLRSC
- [fvalue_S1,ACCS1,S1,cTS1] = wholeline( data,label,'OLRSC',0,parameter);
+ [results_olrsc] = wholeline( data,label,'OLRSC',0,parameter);
+ data_file = [root_dir 'olrsc.mat'];
+ save(data_file, 'results_olrsc');
+ fprintf('save to %s\n', data_file);
  %% ORPCA
- [fvalue_A1,ACCA1,SA1,cTA1] = wholeline( data,label,'ORPCA',0,parameter);
+ [results_orpca] = wholeline( data,label,'ORPCA',0,parameter);
+ data_file = [root_dir 'orpca.mat'];
+ save(data_file, 'results_orpca');
+ fprintf('save to %s\n', data_file);
  %% LRR
- [fvalue_L1,ACCL1,SL1,cTL1] = wholeline( data,label,'LRR',0,parameter);
- %% SSC
- [fvalue_C1,ACCC1,SC1,cTC1] = wholeline( data,label,'SSC');
+ [results_lrr] = wholeline( data,label,'LRR',0,parameter);
+ data_file = [root_dir 'lrr.mat'];
+ save(data_file, 'results_lrr');
+ fprintf('save to %s\n', data_file);
+%  %% SSC
+%  [results_ssc] = wholeline( data,label,'SSC');
+%  data_file = [root_dir 'ssc.mat'];
+%  save(data_file, 'results_ssc');
+%  fprintf('save to %s\n', data_file);
+ end
+end
+

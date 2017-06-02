@@ -13,7 +13,9 @@ function [Z,E] = solve_lrr(X,A,lambda,reg,alm_type,display)
 %            -- reg=1 (or ther values except 0),  use the l1-norm
 %        alm_type -- 0 (default)   use the exact ALM strategy
 %                 -- 1             use the inexact ALM strategy
-%               
+%   
+X = double(X);
+A = double(A);
 if nargin < 6 || isempty(display)
     display = true;
 end

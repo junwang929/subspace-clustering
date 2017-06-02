@@ -1,7 +1,9 @@
 function [U,V,obj,Time] = NLRRplus(Z,A,U,V,beta,k,epsilon, max_inner,nk,label)
   
   [m n] = size(Z);
-  maxiter = 10;
+  maxiter = 15;
+  epsilon = 0.005;
+  miniter = 7;
   iter = 1;
   R = Z - A*U*V';
   nowobj = 0.5*norm(R,'fro')^2 + 0.5*beta*norm(U,'fro')^2 + 0.5*beta*norm(V,'fro')^2;
@@ -10,6 +12,8 @@ function [U,V,obj,Time] = NLRRplus(Z,A,U,V,beta,k,epsilon, max_inner,nk,label)
   obj = [obj nowobj];
   Time =[];
   Time = [Time 0];
+  sumTime = 0;
+  T_sec = 0;
   Q = A*A';
   tic;
   [QU, QD] = svd(Q);
@@ -23,13 +27,16 @@ function [U,V,obj,Time] = NLRRplus(Z,A,U,V,beta,k,epsilon, max_inner,nk,label)
   converged = true;
 while converged
  	timebegin = cputime;
-  
-	 for tt=1:k % k is the estimated rank
+     tic;
+	 for tt=1:k% k is the estimated rank
+         tempU = U;
+         tempV = V;
          t = ceil(rand()*k);
 		 ut = U(:,t);
 		 vt = V(:,t);
+         
          R = R + (A*ut)*vt';
-        for inneriter = 1:max_inner %inner iteration
+        for inneriter = 1:max_inner%inner iteration
             %% Update u_t
 	         Rvt = R*vt;
 			 QRvt = Q*Rvt;
@@ -47,18 +54,28 @@ while converged
          R = R - (A*ut)*vt';
 		 U(:,t) = ut;
 		 V(:,t) = vt;
-    end
+     end
+     T_sec = toc;
+     sumTime = sumTime +T_sec;
+     Time = [Time sumTime];
      tempobj = nowobj;
 	 nowobj = 0.5*norm(R, 'fro')^2+0.5*beta*norm(U,'fro')^2+0.5*beta*norm(V, 'fro')^2;
      obj = [obj nowobj];
 	 totaltime = totaltime + (cputime - timebegin);
      if iter==1
          Decrease = tempobj - nowobj;
+         fprintf('Iter %g  Decrease %g\n', iter, Decrease);
      end
-     if iter == maxiter||tempobj - nowobj >0 && tempobj - nowobj < epsilon*Decrease 
+     if iter == maxiter ||tempobj - nowobj >0 && tempobj - nowobj < epsilon*Decrease...
+             || tempobj-nowobj<0&& iter>=4
+    % if iter >=miniter && tempobj - nowobj < epsilon*Decrease
          converged = false;
      end
-     fprintf('Iter %g  Obj %g Time %g\n', iter, nowobj, totaltime);
+     if tempobj - nowobj<0
+         U = tempU;
+         V = tempV;
+     end
+     fprintf('Iter %g  Obj %g Diff %g Time %g\n', iter, nowobj,tempobj - nowobj, totaltime);
      iter = iter + 1;
   end
 end
